@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+
+import subprocess
+import argparse
+import sys
+
+DESCRIPTION = 'Download, extract, and create environment variables for MUMPS 20.06 interpreter, compiler, and server daemon'
+
+DOWNLOAD_LINK = 'https://www.cs.uni.edu/~okane/source/MUMPS-MDH/mumps-20.06.src.tar.gz'
+ARCHIVE_PATH = '~/Downloads/mumps-20.06.src.tar.gz'
+
+EXTRACTION_PATH = '/usr/lib'
+MUMPS_LIB_PATH = f'{EXTRACTION_PATH}/mumpsc'
+SYMLINK_PATH = '/usr/bin'
+
+
+def main():
+    user_confirmed = ask_to_confirm_warning()
+
+    if user_confirmed:
+        run()
+    else:
+        print('\nUser canceled')
+
+    return 0
+
+def ask_to_confirm_warning():
+    answer = input(f'\
+        \nWARNING: Will overwrite existing MUMPS commands if existent. \
+        \nYou may need to navigate to `{MUMPS_LIB_PATH}/` for additional configuration. \
+        \n\nContinue? y/n: '
+    )
+    
+    return (answer=='yes') or (answer=='y')
+
+def run():
+    download_mumps_src_archive()
+    extract()
+    symlink_binaries()
+
+def download_mumps_src_archive():
+    subprocess.run([f'wget -O {ARCHIVE_PATH} {DOWNLOAD_LINK}'], check=True, shell=True)
+
+def extract():
+    subprocess.run([f'tar -xzvf {ARCHIVE_PATH} -C {EXTRACTION_PATH}'], check=True, shell=True)
+
+def symlink_binaries():
+    binaries = [
+        'mumps',
+        'mumpsc',
+        'mumps2c',
+        'mumpsRO',
+        'mumpsd',
+    ]
+
+    for binary in binaries:
+        subprocess.run([f'ln -svf {MUMPS_LIB_PATH}/{binary} {SYMLINK_PATH}/{binary}'], check=True, shell=True)
+
+def setup_parser():
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser.parse_args()
+
+
+if __name__ == '__main__':
+    setup_parser()
+    sys.exit(main())
+
