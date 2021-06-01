@@ -26,8 +26,7 @@ def main():
 
 def ask_to_confirm_warning():
     answer = input(f'\
-        \nWARNING: Will overwrite existing MUMPS commands if existent. \
-        \nYou may need to navigate to `{MUMPS_LIB_PATH}/` for additional configuration. \
+        \nWARNING: Will replace existing MUMPS commands if existent \
         \n\nContinue? y/n: '
     )
     
